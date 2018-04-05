@@ -83,7 +83,7 @@ render() {
                                     <br/>
                                     <label>
                                         <input name="rdLang" type="radio" value="vi" onChange={this.onHandleChang}
-                                               checked={this.state.rdLang === "vi"/>
+                                               checked={this.state.rdLang === "vi"}/>
                                         Tieng Viet
                                     </label>
                                 </div>
