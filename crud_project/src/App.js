@@ -9,8 +9,10 @@ class App extends Component {
         this.state = {
             tasks: [],
             isDisplayForm: false,
+            isTaskUpdate: null
         };
     };
+
     componentWillMount() {
         if (localStorage && localStorage.getItem('tasks')) {
             var tasks = JSON.parse(localStorage.getItem('tasks'));
@@ -20,29 +22,7 @@ class App extends Component {
         }
 
     };
-    // onGenerate = () => {
-    //     var tasks = [
-    //         {
-    //             id: this.generateID(),
-    //             name: 'Hoc React',
-    //             status: true
-    //         },
-    //         {
-    //             id: this.generateID(),
-    //             name: 'Hoc React2',
-    //             status: true
-    //         },
-    //         {
-    //             id: this.generateID(),
-    //             name: 'Hoc React3',
-    //             status: true
-    //         }
-    //     ];
-    //     this.setState({
-    //         tasks : tasks
-    //     });
-    //     localStorage.setItem('tasks', JSON.stringify(tasks));
-    // };
+
     s4() {
         return Math.floor((1+Math.random()) * 0x10000).toString(20).substring(1);
     }
@@ -50,26 +30,51 @@ class App extends Component {
     generateID() {
         return this.s4() + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' + this.s4() + this.s4() + this.s4();
     }
+
     chang = () => {
-        this.setState({
-            isDisplayForm : !this.isDisplayForm
-        });
+        if (this.state.isDisplayForm && this.state.isTaskUpdate !== null) {
+            this.setState({
+                isDisplayForm : true,
+                isTaskUpdate: null
+            });
+        } else {
+            this.setState({
+                isDisplayForm : !this.isDisplayForm,
+                isTaskUpdate: null
+            });
+        }
     };
+
     onCloseForm = () => {
+       
         this.setState({
             isDisplayForm:false
-        })
+        });
     };
+
+    onShowForm = () => {
+        this.setState({
+            isDisplayForm: true
+        });
+    };
+
     onResubmit = (data) => {
         var { tasks } = this.state;
-        data.id = this.generateID();
-        tasks.push(data);
+        if (data.id === "") {
+            data.id = this.generateID();
+            tasks.push(data);
+        } else {
+            var index = this.findIndex(data.id);
+            tasks[index] = data;  
+        }
         this.setState({
-            tasks : tasks
+            tasks : tasks,
+            isTaskUpdate : null
         });
         localStorage.setItem('tasks', JSON.stringify(tasks));
 
     };
+
     onUpdateStatus = (id) => {
         var { tasks } = this.state;
         var index = this.findIndex(id);
@@ -81,6 +86,7 @@ class App extends Component {
             localStorage.setItem('tasks', JSON.stringify(tasks));
         }
     };
+
     findIndex = (id) => {
         var { tasks } = this.state;
         var result = -1;
@@ -91,6 +97,7 @@ class App extends Component {
         });
         return result;
     };
+
     onDelete = (id) => {
         var { tasks } = this.state;
         var index = this.findIndex(id);
@@ -103,9 +110,20 @@ class App extends Component {
         }
         this.onCloseForm();
     };
+
+    onUpdate = (id) => {
+        var { tasks } = this.state;
+        var index = this.findIndex(id);
+        var isTaskUpdate = tasks[index];
+        this.setState({
+            isTaskUpdate : isTaskUpdate,
+        });
+        this.onShowForm();
+    };
+
     render() {
-        var {tasks, isDisplayForm} = this.state;// var tasks = this.state.tasks
-        var elmTaskForm = isDisplayForm ?  <Taskform onCloseForm={this.onCloseForm} onResubmit={this.onResubmit} /> : '';
+        var {tasks, isDisplayForm, isTaskUpdate} = this.state;// var tasks = this.state.tasks
+        var elmTaskForm = isDisplayForm ?  <Taskform onCloseForm={this.onCloseForm} onResubmit={this.onResubmit} task={isTaskUpdate}/> : '';
         var changColLg = isDisplayForm ? 'col-xs-8 col-sm-8 col-md-8 col-lg-8' : 'col-xs-12 col-sm-12 col-md-12 col-lg-12';
         var changColSm = isDisplayForm ? 'col-xs-4 col-sm-4 col-md-4 col-lg-4' : '';
         return (
@@ -125,7 +143,11 @@ class App extends Component {
                         <Control />
                         <div className="row mt-15">
                             <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                                <Tasklist tasks={tasks} onUpdateStatus={this.onUpdateStatus} onDelete={this.onDelete}/>
+                                <Tasklist tasks={tasks} 
+                                    onUpdateStatus={this.onUpdateStatus} 
+                                    onDelete={this.onDelete} 
+                                    onUpdate={this.onUpdate}    
+                                />
                             </div>
                         </div>
                     </div>
