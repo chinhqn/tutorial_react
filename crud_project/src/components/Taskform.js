@@ -6,8 +6,8 @@ class Taskform extends Component {
             id: '',
             name: '',
             status: true
-        }
-    }
+        };
+    };
 
     onCloseForm = () => {
         this.props.onCloseForm();
@@ -52,7 +52,6 @@ class Taskform extends Component {
     };
 
     componentWillReceiveProps(nextProps) {
-
         if (nextProps && nextProps.task) {
             this.setState({
                 id : nextProps.task.id,
@@ -60,13 +59,13 @@ class Taskform extends Component {
                 status : nextProps.task.status
             });
         } else if (nextProps && nextProps.task === null) {
-            this.state = {
+            this.setState = {
                 id: '',
                 name: '',
                 status: true
             }
         }
-    }
+    };
 
     render() {
         var { id } = this.state;
